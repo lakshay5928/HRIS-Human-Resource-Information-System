@@ -1,0 +1,1 @@
+payroll = clean_mongo_docs(list_payroll())

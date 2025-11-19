@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>HR Dashboard</h2>
+
+<!-- Summary Cards -->
+<div class="stats">
+    <div class="stat card">
+        <h3>Total Employees</h3>
+        <div class="stat-value">{{ total_employees }}</div>
+    </div>
+    <div class="stat card">
+        <h3>Pending Payroll</h3>
+        <div class="stat-value">{{ pending_payroll }}</div>
+    </div>
+    <div class="stat card">
+        <h3>Avg Salary</h3>
+        <div class="stat-value">₹ {{ avg_salary }}</div>
+    </div>
+    <div class="stat card">
+        <h3>Payroll Risk (ML)</h3>
+        <div class="stat-value">{{ payroll_risk_count }}</div>
+    </div>
+    <div class="stat card">
+        <h3>Attrition Risk (ML)</h3>
+        <div class="stat-value">{{ attrition_risk_count }}</div>
+    </div>
+</div>
+
+<!-- Payroll Chart -->
+<div class="panel card">
+    <h3>Payroll Analytics</h3>
+    <canvas id="payrollChart" height="120"></canvas>
+</div>
+
+<!-- Employee Table -->
+<div class="panel card">
+    <h3>Employee Overview</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Dept</th>
+                <th>Salary</th>
+                <th>Tenure</th>
+                <th>Absences</th>
+                <th>Salary Pending</th>
+                <th>Payroll Risk</th>
+                <th>Attrition Risk</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in employees %}
+            {% set pred = (preds | selectattr('employee_id','equalto', e.employee_id) | list)[0] %}
+            <tr>
+                <td>{{ e.employee_id }}</td>
+                <td>{{ e.name }}</td>
+                <td>{{ e.department }}</td>
+                <td>₹ {{ e.salary }}</td>
+                <td>{{ e.tenure_years }}</td>
+                <td>{{ e.absence_count }}</td>
+                <td>{{ 'Yes' if e.salary_pending else 'No' }}</td>
+
+                <!-- Payroll Risk Column -->
+                {% if pred.payroll_risk %}
+                <td style="color: #ff6b6b; font-weight: bold;">At Risk</td>
+                {% else %}
+                <td style="color: #4ade80;">OK</td>
+                {% endif %}
+
+                <!-- Attrition Risk Column -->
+                {% if pred.attrition_risk %}
+                <td style="color: #ffb84d; font-weight: bold;">Likely to Leave</td>
+                {% else %}
+                <td style="color: #4ade80;">Stable</td>
+                {% endif %}
+
+                <td><a class="btn small" href="{{ url_for('employee_view', eid=e.employee_id) }}">View</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- 🔔 System Trigger Log -->
+<div class="panel card">
+    <h3>System Triggers (Recent)</h3>
+    {% if triggers %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Event Type</th>
+                <th>Message</th>
+                <th>Employee ID</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in triggers %}
+            <tr>
+                <td><strong>{{ t.event_type }}</strong></td>
+                <td>{{ t.message }}</td>
+                <td>{{ t.employee_id or '-' }}</td>
+                <td><small>{{ t.timestamp }}</small></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No triggers generated yet.</p>
+    {% endif %}
+</div>
+
+<!-- Payroll Chart Script -->
+<script>
+    const payroll = {{ payroll_chart|tojson }};
+    const labels = payroll.map(p => p.employee_id);
+    const amounts = payroll.map(p => p.amount);
+    const ctx = document.getElementById('payrollChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Payroll Amount',
+                data: amounts,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                title: { display: true, text: 'Monthly Payroll Distribution', color: '#fff' }
+            },
+            scales: {
+                x: { ticks: { color: '#ccc' } },
+                y: { ticks: { color: '#ccc' } }
+            }
+        }
+    });
+</script>
+{% endblock %}

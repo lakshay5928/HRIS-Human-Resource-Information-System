@@ -1,0 +1,26 @@
+# Python & Flask ignored files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
+# Environment
+.env
+.venv/
+venv/
+ENV/
+
+# Models and datasets
+ml_models/
+datasets/
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+
+# Logs and temporary files
+*.log
+*.tmp
