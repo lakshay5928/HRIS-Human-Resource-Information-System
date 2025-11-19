@@ -105,9 +105,9 @@ Contributions are what make the open-source community such an amazing place to l
 4.  Push to the Branch (`git push origin feature/AmazingFeature`)
 5.  Open a Pull Request
 
-## 📧 Contact
+## 📧 Author
 
-Lakshay - `[TODO: Your Email Address, e.g., lakshay5928@example.com]`
+Lakshay Verma- `[lakshayverma301@gmail.com]`
 
 Project Link: [https://github.com/lakshay5928/HRIS-Human-Resource-Information-System](https://github.com/lakshay5928/HRIS-Human-Resource-Information-System)
 
